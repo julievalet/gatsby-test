@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Link, graphql } from "gatsby";
+import { graphql } from "gatsby";
+import { Link, Trans } from "gatsby-plugin-react-i18next";
 import Layout from "../../components/layout";
 
 const BlogPage = ({ data }) => {
@@ -10,7 +11,9 @@ const BlogPage = ({ data }) => {
                     <h2>
                         <Link to={`/blog/${node.frontmatter.slug}`}>{node.frontmatter.title}</Link>
                     </h2>
-                    <p>Posted: {node.frontmatter.date}</p>
+                    <p>
+                        <Trans>Posted:</Trans> {node.frontmatter.date}
+                    </p>
                 </article>
             ))}
         </Layout>
@@ -18,16 +21,29 @@ const BlogPage = ({ data }) => {
 };
 
 export const query = graphql`
-    query {
-        allMdx(sort: { fields: frontmatter___date, order: DESC }) {
+    query ($language: String!) {
+        allMdx(
+            sort: { fields: frontmatter___date, order: DESC }
+            filter: { frontmatter: { lang: { eq: $language } } }
+        ) {
             nodes {
                 frontmatter {
                     date(formatString: "MMMM D, YYYY")
                     title
                     slug
+                    lang
                 }
                 id
                 excerpt
+            }
+        }
+        locales: allLocale(filter: { language: { eq: $language } }) {
+            edges {
+                node {
+                    ns
+                    data
+                    language
+                }
             }
         }
     }

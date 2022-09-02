@@ -1,6 +1,7 @@
 import * as React from "react";
-import { graphql, Link } from "gatsby";
+import { graphql } from "gatsby";
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
+import { Trans } from "gatsby-plugin-react-i18next";
 import Layout from "../../components/layout";
 
 const BlogPost = ({ data, children }) => {
@@ -11,7 +12,7 @@ const BlogPost = ({ data, children }) => {
             <p>{data.mdx.frontmatter.date}</p>
             <GatsbyImage image={image} alt={data.mdx.frontmatter.hero_image_alt} />
             <p>
-                Photo Credit:{" "}
+                <Trans>Photo Credit:</Trans>{" "}
                 <a href={data.mdx.frontmatter.hero_image_credit_link}>{data.mdx.frontmatter.hero_image_credit_text}</a>
             </p>
             {children}
@@ -20,7 +21,7 @@ const BlogPost = ({ data, children }) => {
 };
 
 export const query = graphql`
-    query ($id: String) {
+    query ($id: String, $language: String!) {
         mdx(id: { eq: $id }) {
             frontmatter {
                 title
@@ -32,6 +33,15 @@ export const query = graphql`
                     childImageSharp {
                         gatsbyImageData
                     }
+                }
+            }
+        }
+        locales: allLocale(filter: { language: { eq: $language } }) {
+            edges {
+                node {
+                    ns
+                    data
+                    language
                 }
             }
         }
